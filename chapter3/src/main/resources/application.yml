@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_enterprise
+    username: spring
+    password: spring$pass
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
