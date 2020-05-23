@@ -16,10 +16,14 @@ import java.io.IOException;
 public class ResourceApp {
 
     public static void main(String[] args) {
+        // 创建 ResourceLoader
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        // 获取Resource
         Resource res = resolver.getResource("classpath:bean.xml");
 
+        // 创建 BeanFactory
         DefaultListableBeanFactory factory = new DefaultListableBeanFactory();
+        // xml 解析
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(factory);
         reader.loadBeanDefinitions(res);
 
