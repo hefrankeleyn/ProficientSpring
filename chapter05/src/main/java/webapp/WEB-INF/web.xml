@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+<!--    指定配置文件-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath: beans.xml</param-value>
+    </context-param>
+    
+<!--    声明Web容器的监听器, 用于启动 WebApplicationContext -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+<!--    对于不支持 容器监听器的低版本Web容器， 则可以采用 ContextLoaderServlet-->
+    <!--<servlet>
+        <servlet-name>springContextLoaderServlet</servlet-name>
+        <servlet-class>org.springframework.web.context.ContextLoaderServlet</servlet-class>
+    </servlet>-->
+
+<!--   用于启动request、session和globalSesion 作用域， 低版本Web容器（Servlet2.3之前）中的配置-->
+    <!--<filter>
+        <filter-name>requestContextFilter</filter-name>
+        <filter-class>org.springframework.web.filter.RequestContextFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>requestContextFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>-->
+    <!--   用于启动request、session和globalSesion 作用域， 高版本Web容器中的配置-->
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+
+
+</web-app>

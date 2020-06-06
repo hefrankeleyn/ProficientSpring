@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+    <!--<bean id="car" class="com.hef.beans.Car">
+        <property name="brand"><value>CF03</value></property>
+        <property name="color"><value>Red</value></property>
+        <property name="maxSpeed"><value>200</value></property>
+    </bean>-->
+
+    <bean id="car01" class="com.hef.beans.Car">
+        <constructor-arg type="int">
+            <value>500</value>
+        </constructor-arg>
+        <property name="brand" value="CF001"></property>
+    </bean>
+
+    <bean id="car02" class="com.hef.beans.Car">
+        <constructor-arg index="0" type="java.lang.String">
+            <value>BossHongQi</value>
+        </constructor-arg>
+        <constructor-arg index="1" type="java.lang.String">
+            <value>Green</value>
+        </constructor-arg>
+        <constructor-arg index="2" type="int">
+            <value>200</value>
+        </constructor-arg>
+    </bean>
+    <!--    非静态工厂工厂方法注入-->
+    <bean id="carFactory" class="com.hef.factory.CarFactory"/>
+    <bean id="hongQiCar" factory-bean="carFactory" factory-method="createHongQiCar"/>
+
+    <!--    静态工厂方法注入-->
+    <bean id="btCar" class="com.hef.factory.CarStaticFactory" factory-method="createBTCar"/>
+
+    <bean id="boss" class="com.hef.beans.Boss">
+        <property name="car">
+            <ref bean="btCar"/>
+        </property>
+    </bean>
+
+
+</beans>

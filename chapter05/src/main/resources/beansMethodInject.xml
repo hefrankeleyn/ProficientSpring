@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+
+    <context:component-scan base-package="com.hef.dao">
+        <context:exclude-filter type="" expression=""/>
+        <context:include-filter type="" expression=""/>
+    </context:component-scan>
+
+<!--    通过XML配置文件引用 @Configuration 的配置-->
+    <context:component-scan base-package="com.hef.conf" resource-pattern="UserConf.class"/>
+
+    <bean id="car" class="com.hef.injectfun.Car"
+          p:brand="InjectCar"
+          p:color="red"
+          p:maxSpeed="200" scope="prototype"/>
+
+    <bean id="magicBoss" class="com.hef.injectfun.MagicBoss">
+        <lookup-method name="getCar" bean="car"/>
+    </bean>
+
+    <bean id="boss1" class="com.hef.injectfun.Boss1">
+        <replaced-method name="getCar" replacer="boss2"/>
+    </bean>
+    <bean id="boss2" class="com.hef.injectfun.Boss2"/>
+
+
+<!--    Bean的继承 -->
+    <bean id="abstractCar" class="com.hef.injectfun.Car"
+          p:brand="abstractCar" p:color="红色" p:maxSpeed="1024"
+          abstract="true"/>
+    <bean id="car05" class="com.hef.injectfun.Car" p:brand="C05" parent="abstractCar"/>
+    <bean id="car06" class="com.hef.injectfun.Car" p:brand="C06" p:color="黑色" parent="abstractCar"/>
+
+    <bean name="carRequest" class="com.hef.beans.Car">
+        <constructor-arg type="int" value="200"/>
+        <aop:scoped-proxy/>
+    </bean>
+
+    <bean name="boosRequest" class="com.hef.beans.Boss">
+        <property name="car" ref="carRequest"/>
+    </bean>
+
+</beans>

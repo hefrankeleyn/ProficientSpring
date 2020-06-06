@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+<!--    传统的配置方式: 引用属性文件-->
+    <!--<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
+          p:location="classpath:application.properties"
+          p:fileEncoding="UTF-8"></bean>-->
+
+<!--    相当域传统的 PropertySourcesPlaceholderConfigurer 配置方式-->
+<!--    <context:property-placeholder location="classpath:application.properties"/>-->
+
+<!--   2020-06-02 使用自定义对属性加载器后，就无法使用 context 方式了，必须使用传统对方式-->
+    <bean class="com.hef.conf.EncryptPropertyPlaceholderConfigurer"
+          p:location="classpath:application.properties" p:fileEncoding="utf-8"/>
+
+    <bean id="myConfig" class="com.hef.conf.MyConfig" p:username="${username}" p:url="${url}"/>
+
+    <bean id="car01" class="com.hef.beans.Car" p:brand="BM" p:color="红色" p:maxSpeed="300"/>
+    <bean id="boss01" class="com.hef.beans.Boss" p:name="oneBoss" p:car-ref="car01"/>
+
+<!--    注册属性编辑器-->
+    <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+        <property name="customEditors">
+            <map>
+                <entry key="com.hef.beans.Car" value="com.hef.editor.CustomCarEditor"/>
+            </map>
+        </property>
+    </bean>
+
+<!--    使用自定义的编辑器-->
+    <bean id="bossCustom" class="com.hef.beans.Boss" p:name="customBoss" p:car="自定义,黑色,137"/>
+
+</beans>

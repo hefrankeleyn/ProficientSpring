@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+    <bean id="myResource" class="org.springframework.context.support.ResourceBundleMessageSource">
+<!--       通过基名指定资源，相对于类跟路径-->
+        <property name="basenames">
+            <list>
+                <value>i18n/resource</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="myReloadResource"
+          class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+        <!--       通过基名指定资源，相对于类跟路径-->
+        <property name="basenames">
+            <list>
+                <value>i18n/resource</value>
+            </list>
+        </property>
+<!--        设置cacheSeconds 属性让 ReloadableResourceBundleMessageSource 每隔5秒刷新一次资源文件。
+       在真实的情况下，太过频繁的刷新将会带来性能上的负面影响，一般不建议小于1分钟。 -->
+<!--        cacheSeconds 默认值为 -1， 表示永不刷新， 此时退化为 ResourceBundleMessageSource 功能 -->
+        <property name="cacheSeconds" value="5"/>
+    </bean>
+
+</beans>
