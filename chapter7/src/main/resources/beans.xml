@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+<!--    前置增强-->
+    <bean id="greetingBeforeAdvice" class="com.hef.advice.GreetingBeforeAdvice"/>
+<!--    后置增强-->
+    <bean id="greetingAfterAdvice" class="com.hef.advice.GreetingAfterAdvice"/>
+
+<!--    目标对象-->
+    <bean id="target" class="com.hef.service.impl.NativeWaiter"/>
+
+<!--    为目标对象添加后置和前置增强-->
+    <bean id="waiter" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:proxyInterfaces="com.hef.service.Waiter"
+          p:interceptorNames="greetingBeforeAdvice,greetingAfterAdvice" p:target-ref="target"/>
+
+<!--    环绕增强-->
+    <bean id="greetingInterceptor" class="com.hef.advice.GreetingInterceptor"/>
+<!--    使用环绕增强代替前置增强和后置增强-->
+    <bean id="waiter02" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:proxyInterfaces="com.hef.service.Waiter"
+          p:interceptorNames="greetingInterceptor" p:target-ref="target"/>
+
+<!--    发生异常的目标对象-->
+    <bean id="exceptionTarget" class="com.hef.service.impl.ExceptionForum"/>
+<!--    异常增强-->
+    <bean id="greetingThrowAdvice" class="com.hef.advice.GreetingThrowAdvice"/>
+<!--  使用异常增强 -->
+    <bean id="exceptionForum" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:proxyInterfaces="com.hef.service.ForumService"
+          p:interceptorNames="greetingThrowAdvice" p:target-ref="exceptionTarget"/>
+
+<!--    引介增强-->
+    <bean id="controllablePerformanceMonitor" class="com.hef.advice.ControllablePerformanceMonitor"/>
+<!--    目标对象-->
+    <bean id="forumService" class="com.hef.service.impl.ForumServiceImpl"/>
+<!--    使用引介增强, 由于引介增强一定要通过创建子类来生成代理，所以需要强制使用CGLib， 否则会报错-->
+    <bean id="monitorService" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interfaces="com.hef.service.MonitorAble"
+          p:interceptorNames="controllablePerformanceMonitor"
+          p:target-ref="forumService"
+          p:proxyTargetClass="true"/>
+
+
+</beans>
