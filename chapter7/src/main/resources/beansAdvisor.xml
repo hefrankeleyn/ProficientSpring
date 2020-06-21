@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+<!--    前置增强-->
+    <bean id="greetingBeforeAdvice" class="com.hef.advice.GreetingBeforeAdvice"/>
+<!--    切点,  并向切点注入一个增强 -->
+    <bean id="greetingAdvisor" class="com.hef.advice.GreetingAdvisor"
+          p:advice-ref="greetingBeforeAdvice"/>
+<!--    目标对象-->
+    <bean id="waiterTarget" class="com.hef.service.impl.NativeWaiter"/>
+    <bean id="sellerTarget" class="com.hef.service.impl.NativeSeller"/>
+
+<!--    通过一个父<bean>定义公共的配置信息-->
+    <bean id="parent" abstract="true" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="greetingAdvisor"
+          p:proxyTargetClass="true"/>
+<!--    waiter代理-->
+    <bean id="waiter" parent="parent" p:target-ref="waiterTarget"/>
+<!--    seller 代理-->
+    <bean id="seller" parent="parent" p:target-ref="sellerTarget"/>
+
+    <!--   定义切面 -->
+    <bean id="regexpAdvisor"
+          class="org.springframework.aop.support.RegexpMethodPointcutAdvisor"
+          p:advice-ref="greetingBeforeAdvice">
+        <property name="patterns">
+            <list>
+                <value>.*greet.*</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--    通过一个父<bean>定义公共的配置信息-->
+    <bean id="regexpParent" abstract="true" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="regexpAdvisor"
+          p:proxyTargetClass="true"/>
+    <!--    waiter代理-->
+    <bean id="waiterRegexp" parent="regexpParent" p:target-ref="waiterTarget"/>
+    <!--    seller 代理-->
+    <bean id="sellerRegexp" parent="regexpParent" p:target-ref="sellerTarget"/>
+
+
+    <bean id="waiterTarget03" class="com.hef.service.impl.NativeWaiter"/>
+
+    <bean id="dynamicAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="pointcut">
+            <bean class="com.hef.advice.GreetingDynamicPointcut"/>
+        </property>
+        <property name="advice">
+            <bean class="com.hef.advice.GreetingBeforeAdvice"/>
+        </property>
+    </bean>
+
+    <bean id="waiter2" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="dynamicAdvisor"
+          p:target-ref="waiterTarget03"
+          p:proxyTargetClass="true"/>
+
+
+
+
+</beans>
