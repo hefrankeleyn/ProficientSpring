@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+<!--    前置增强-->
+    <bean id="greetingBeforeAdvice" class="com.hef.advice.GreetingBeforeAdvice"/>
+<!--    目标对象-->
+    <bean id="waiterTarget" class="com.hef.service.impl.NativeWaiter"/>
+
+    <bean id="controlFlowPointcut" class="org.springframework.aop.support.ControlFlowPointcut">
+<!--        指定流程切面的类-->
+        <constructor-arg type="java.lang.Class" value="com.hef.service.impl.WaiterDelegate"/>
+<!--        指定流程切点的方法 -->
+        <constructor-arg type="java.lang.String" value="service"/>
+    </bean>
+
+    <bean id="controlFlowAdvice"
+          class="org.springframework.aop.support.DefaultPointcutAdvisor"
+          p:pointcut-ref="controlFlowPointcut" p:advice-ref="greetingBeforeAdvice">
+    </bean>
+
+    <bean id="waiter03" class="org.springframework.aop.framework.ProxyFactoryBean"
+          p:interceptorNames="controlFlowAdvice"
+          p:target-ref="waiterTarget"
+          p:proxyTargetClass="true"/>
+</beans>
