@@ -7,19 +7,16 @@
          http://www.springframework.org/schema/context
          http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
-<!--    前置增强-->
+    <!--    前置增强-->
     <bean id="greetingBeforeAdvice" class="com.hef.advice.GreetingBeforeAdvice"/>
-    <bean id="gcp" class="com.hef.advice.GreetingComposablePointcut"/>
-<!--    目标对象-->
+    <!--    目标对象-->
     <bean id="waiterTarget" class="com.hef.service.impl.NativeWaiter"/>
-<!--    引用gcp.getIntersectionPointcut() 方法返回的复合切点-->
-    <bean id="composableAdvice"
-          class="org.springframework.aop.support.DefaultPointcutAdvisor"
-          p:pointcut="#{gcp.intersectionPointcut}"
-          p:advice-ref="greetingBeforeAdvice">
-    </bean>
-    <bean id="waiter05" class="org.springframework.aop.framework.ProxyFactoryBean"
-          p:interceptorNames="composableAdvice"
-          p:target-ref="waiterTarget"
-          p:proxyTargetClass="true"/>
+    <bean id="sellerTarget" class="com.hef.service.impl.NativeSeller"/>
+
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator"
+          p:beanNames="*erTarget"
+          p:interceptorNames="greetingBeforeAdvice"
+          p:optimize="true"/>  /* 强制使用 cglib */
+
+
 </beans>
