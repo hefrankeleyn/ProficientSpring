@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+<!--    目标Bean-->
+    <bean id="waiter" class="com.hef.service.impl.NaiveWaiter"/>
+<!--    使用@Aspect 注解的切面类-->
+    <bean class="com.hef.aspectj.PreGreetingAspect"/>
+<!--    自动代理创建器， 自动将@AspectJ注解切面类织入到目标Bean中 -->
+    <bean class="org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator"/>
+</beans>
