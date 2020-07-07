@@ -33,4 +33,15 @@ public class WaiterService {
         Seller seller = (Seller) waiter;
         seller.sell("apple");
     }
+
+    @Test
+    public void annoWaiterTest(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans-aspect-method.xml");
+        Waiter naiveWaiter = (Waiter) context.getBean("naiveWaiter");
+        naiveWaiter.greetTo("XiaoHong");
+        Waiter annoWaiter = (Waiter) context.getBean("annoWaiter");
+        annoWaiter.greetTo("XiaoHong");
+    }
+
+
 }
