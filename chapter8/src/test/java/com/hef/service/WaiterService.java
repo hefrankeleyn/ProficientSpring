@@ -43,5 +43,13 @@ public class WaiterService {
         annoWaiter.greetTo("XiaoHong");
     }
 
+    @Test
+    public void birdFlyTest(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans-aspect-method.xml");
+        Bird oneBird = context.getBean("oneBird", Bird.class);
+        Fly oneFly = context.getBean("oneFly", Fly.class);
+        oneBird.action(oneFly);
+    }
+
 
 }
