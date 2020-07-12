@@ -437,5 +437,5 @@ public void bindTypeAnnoObject(NeedTest needTest){
     }
 ```
 
-## 五、基于Schema配置切面
+
 
