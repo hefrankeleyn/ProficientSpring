@@ -11,8 +11,8 @@ import org.aspectj.lang.annotation.DeclareParents;
  */
 @Aspect
 public class EnableSellerAspect {
-
     // 默认的接口实现
-    @DeclareParents(value = "com.hef.service.impl.NaiveWaiter", defaultImpl = SmartSeller.class)
-    public Seller seller; // 要实现的目标接口
+    @DeclareParents(value = "com.hef.service.impl.NaiveWaiter",
+            defaultImpl = SmartSeller.class)
+    public static Seller seller; // 要实现的目标接口
 }

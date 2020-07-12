@@ -252,3 +252,126 @@ public void readyFly(){
 
 一般情况下，`target()`与`this()`等效。区别在引介增强时，`this()`能匹配到引入接口方法，而`target()`匹配不到。
 
+引介增强：
+
+```java
+@Aspect
+public class EnableSellerAspect {
+    // 默认的接口实现
+    @DeclareParents(value = "com.hef.service.impl.NaiveWaiter",
+            defaultImpl = SmartSeller.class)
+    public static Seller seller; // 要实现的目标接口
+}
+```
+
+后置增强：
+
+```java
+@Aspect
+public class ThisTestAspect {
+    @AfterReturning("this(com.hef.service.Seller)")
+    public void thisTest(){
+        System.out.println("ThisTestAspect#thisTest() executed.");
+    }
+}
+```
+
+配置
+
+```xml
+<!--    基于AspectJ切面的驱动器-->
+    <aop:aspectj-autoproxy/>
+<!--    目标Bean-->
+    <bean id="waiter" class="com.hef.service.impl.NaiveWaiter"/>
+<!--    使用@Aspect 注解的切面类-->
+    <bean class="com.hef.aspectj.EnableSellerAspect"/>
+    <bean class="com.hef.aspectj.ThisTestAspect"/>
+<!-- 目标类-->
+    <bean id="smartSeller" class="com.hef.service.impl.SmartSeller"/>
+```
+
+测试（**运行之后的效果和书上的不一样**）：
+
+```java
+    @Test
+    public void thisTest(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans-aop-declare.xml");
+        Waiter waiter = context.getBean("waiter", Waiter.class);
+        waiter.greetTo("XiaoHong");
+        waiter.serveTo("xiaoHong");
+        // 发现这样转换之后，并不代理
+        Seller seller = (Seller) waiter;
+        seller.sell("apple");
+        // 这样是可以代理的
+        Seller smartSeller = context.getBean("smartSeller", Seller.class);
+        smartSeller.sell("one apple");
+    }
+```
+
+运行的效果
+
+```java
+NaiveWaiter: greet to XiaoHong
+ThisTestAspect#thisTest() executed.
+NaiveWaiter: serving xiaoHong
+ThisTestAspect#thisTest() executed.
+There sell apple
+There sell one apple
+ThisTestAspect#thisTest() executed.
+```
+
+## 四、`@AspectJ`进阶
+
+### 4.1 切点的复合运算
+
+- `@After("within(com.hef.*) && execution(* greetTo(..)))")`
+- `@Before(" !target(com.hef.NaiveWaiter) && execution(* sell(..)))")`
+- `@AfterReturning("target(com.hef.Waiter) || target(com.hef.Seller))")`
+
+### 4.2 切点命名及重用
+
+切点点命名：
+
+```java
+public class TestNamePointcut {
+
+    @Pointcut("within(com.hef.service.*)")
+    private void inPackage(){}
+
+    @Pointcut("execution(* greetTo(..))")
+    protected void greetTo(){}
+
+    /** 引用命名切点定义的切点 */
+    @Pointcut("inPackage() and greetTo()")
+    public void inPackageGreetTo(){}
+}
+```
+
+使用切点命名：
+
+```java
+@Aspect
+public class UseNamePointcutAspect {
+
+    @Before("TestNamePointcut.inPackage()")
+    public void pkgGreetTo(){
+        System.out.println("--pkgGreetTo() executed!--");
+    }
+
+    @Before(" !target(com.hef.service.impl.NaiveWaiter) && TestNamePointcut.inPackage()")
+    public void pkgGreetToNoNaiveWaiter(){
+        System.out.println("pkgGreetToNoNaiveWaiter() executed!--");
+    }
+}
+```
+
+### 4.3 增强织入的顺序
+
+- 如果增强在同一个切面类中声明，则依照增强在切面类中定义的顺序进行织入；
+- 如果增强在不同的类面类中声明，并且这些切面类都实现了`org.springframework.core.Ordered`接口，则由接口方法的顺序号决定；
+- 如果增强在不同的切面类中，且这些切面类没有实现`org.springframework.core.Ordered`接口，则织入顺序是不确定的；
+
+### 4.5 访问连接点信息
+
+- `AspectJ`使用`org.aspect.lang.JointPoint`接口表示目标类连接点对象；
+- 如果是环绕增强，则使用`org.aspect.lang.ProceedingJointPoint`表示连接点对象；

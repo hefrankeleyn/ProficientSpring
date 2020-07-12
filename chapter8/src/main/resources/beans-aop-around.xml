@@ -11,8 +11,5 @@
 <!--    目标Bean-->
     <bean id="waiter" class="com.hef.service.impl.NaiveWaiter"/>
 <!--    使用@Aspect 注解的切面类-->
-    <bean class="com.hef.aspectj.EnableSellerAspect"/>
-    <bean class="com.hef.aspectj.ThisTestAspect"/>
-<!-- 目标类-->
-    <bean id="smartSeller" class="com.hef.service.impl.SmartSeller"/>
+    <bean class="com.hef.aspectj.AroundTestAspect"/>
 </beans>

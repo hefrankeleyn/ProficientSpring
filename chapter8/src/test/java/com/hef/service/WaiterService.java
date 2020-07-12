@@ -51,5 +51,19 @@ public class WaiterService {
         oneBird.action(oneFly);
     }
 
+    @Test
+    public void thisTest(){
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans-aop-declare.xml");
+        Waiter waiter = context.getBean("waiter", Waiter.class);
+        waiter.greetTo("XiaoHong");
+        waiter.serveTo("xiaoHong");
+        // 发现这样转换之后，并不代理
+        Seller seller = (Seller) waiter;
+        seller.sell("apple");
+        // 这样是可以代理的
+        Seller smartSeller = context.getBean("smartSeller", Seller.class);
+        smartSeller.sell("one apple");
+    }
+
 
 }
