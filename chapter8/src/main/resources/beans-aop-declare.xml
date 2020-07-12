@@ -7,7 +7,7 @@
          http://www.springframework.org/schema/aop
          http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
 <!--    基于AspectJ切面的驱动器-->
-    <aop:aspectj-autoproxy/>
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
 <!--    目标Bean-->
     <bean id="waiter" class="com.hef.service.impl.NaiveWaiter"/>
 <!--    使用@Aspect 注解的切面类-->

@@ -375,3 +375,67 @@ public class UseNamePointcutAspect {
 
 - `AspectJ`使用`org.aspect.lang.JointPoint`接口表示目标类连接点对象；
 - 如果是环绕增强，则使用`org.aspect.lang.ProceedingJointPoint`表示连接点对象；
+
+### 4.6 绑定连接点方法的入参
+
+```java
+    /**
+     * 将匹配 smile(String name, int num)
+     * @param num
+     * @param name
+     */
+    @Before("target(com.hef.service.impl.NaiveWaiter) && args(name, num,..)")
+    public void bindJoinPointParams(int num, String name){
+        System.out.println("--bindJoinPointParams()---");
+        System.out.println("name: " + name);
+        System.out.println("num: " + num);
+        System.out.println("--bindJoinPointParams()---");
+    }
+```
+
+### 4.7 绑定代理对象
+
+```java
+@Before("this(waiter)")
+public void bindProxyObj(Waiter waiter){
+    System.out.println("-- bindProxyObj() --");
+    System.out.println(waiter.getClass().getName());
+    System.out.println("-- bindProxyObj() --");
+}
+```
+
+### 4.8 绑定类的注解对象
+
+```java
+@Before("@within(needTest)")
+public void bindTypeAnnoObject(NeedTest needTest){
+    System.out.println("-- bindTypeAnnoObject -- ");
+    System.out.println(needTest.getClass().getName());
+    System.out.println("-- bindTypeAnnoObject -- ");
+}
+```
+
+### 4.9 绑定返回值
+
+```java
+    @AfterReturning(value = "target(com.hef.service.impl.SmartSeller)", returning = "retVAl")
+    public void bindReturnValue(int retVAl){
+        System.out.println("-- bindReturnValue()--");
+        System.out.println("returnVAlue: " + retVAl);
+        System.out.println("-- bindReturnValue()--");
+    }
+```
+
+### 4.10 绑定抛出的异常
+
+```java
+    @AfterThrowing(value = "target(com.hef.service.impl.SmartSeller)", throwing = "iae")
+    public void bindException(IllegalArgumentException iae){
+        System.out.println("-- bindException() --");
+        System.out.println("exception: " + iae.getMessage());
+        System.out.println("-- bindException() --");
+    }
+```
+
+## 五、基于Schema配置切面
+
