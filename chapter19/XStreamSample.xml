@@ -1,0 +1,13 @@
+<com.hef.beans.User>
+  <userId>1</userId>
+  <userName>xstream</userName>
+  <credits>0</credits>
+  <logs>
+    <com.hef.beans.LoginLog>
+      <loginLogId>0</loginLogId>
+      <userId>0</userId>
+      <ip>192.168.1.91</ip>
+      <loginDate>2020-07-27 07:04:36.619 CST</loginDate>
+    </com.hef.beans.LoginLog>
+  </logs>
+</com.hef.beans.User>

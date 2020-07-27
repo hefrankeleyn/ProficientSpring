@@ -1,0 +1,8 @@
+<user id="1">
+  <username>xstream</username>
+  <birthday>2020-07-28 06:53:09</birthday>
+  <book id="0">
+    <bookName>《book01》</bookName>
+    <userId>1</userId>
+  </book>
+</user>
