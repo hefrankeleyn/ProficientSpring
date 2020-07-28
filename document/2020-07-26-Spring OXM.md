@@ -57,9 +57,16 @@ XStream是一套简洁易用的开源框架，用于将Java对象序列化城XML
 
 ### 3.7 持久化API
 
+将集合中的所有对象持久化到文件系统中。
 
+`XmlArrayList`、`XmlSet`、`XmlMap`
 
 ### 3.8 额外功能：处理JSON
+
+- JettisonMappedXmlDriver
+- JsonHierarchicalStreamDrive
+
+
 
 ## 四、其他的O/X Mapping开源项目
 
