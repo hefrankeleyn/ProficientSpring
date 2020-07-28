@@ -1,0 +1,10 @@
+<object-stream>
+  <user id="1">
+    <username>xstream</username>
+    <birthday>2020-07-28 21:53:54</birthday>
+    <book id="0">
+      <bookName>《book01》</bookName>
+      <userId>1</userId>
+    </book>
+  </user>
+</object-stream>
