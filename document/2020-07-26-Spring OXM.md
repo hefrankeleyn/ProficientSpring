@@ -66,11 +66,11 @@ XStream是一套简洁易用的开源框架，用于将Java对象序列化城XML
 - JettisonMappedXmlDriver
 - JsonHierarchicalStreamDrive
 
-
-
 ## 四、其他的O/X Mapping开源项目
 
 ### 4.1 JAXB
+
+是一项根据XML Schema产生Java类的技术
 
 ### 4.2 Castor
 
