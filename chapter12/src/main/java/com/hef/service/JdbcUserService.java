@@ -13,10 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Connection;
 import java.time.Instant;
 
-/**
- * @author 陈雄华
- * @version 1.0
- */
 @Service("jdbcUserService")
 public class JdbcUserService {
     private JdbcTemplate jdbcTemplate;
@@ -28,18 +24,23 @@ public class JdbcUserService {
 
     @Transactional
     public void logon(String userName) {
+        Connection conn = null;
         try {
             // 通过 jdbcTemplate.getDataSource().getConnection() 获取连接，并不主动归还，将造成数据连接泄露哦
-//            Connection conn = jdbcTemplate.getDataSource().getConnection();
+//            conn = jdbcTemplate.getDataSource().getConnection();
             // 通过 DataSourceUtils 获取连接，在事务环境下，不会造成连接泄露
-            Connection conn = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
-            
+            conn = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
+
             String sql = "UPDATE t_user SET last_visit=? WHERE user_name =?";
             jdbcTemplate.update(sql, MyInstantUtils.instantToDefaultFormatStr(Instant.now()), userName);
             Thread.sleep(1000);//②模拟程序代码的执行时间
         } catch (Exception e) {
             e.printStackTrace();
         }
+        /* 无事务的环境下，需要手动执行下面的代码，进行连接释放*/
+        /*finally {
+            DataSourceUtils.releaseConnection(conn, jdbcTemplate.getDataSource());
+        }*/
 
     }
 
