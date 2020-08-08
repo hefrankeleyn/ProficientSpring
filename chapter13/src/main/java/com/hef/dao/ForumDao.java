@@ -2,13 +2,16 @@ package com.hef.dao;
 
 import com.hef.beans.Forum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
+import java.util.List;
 
 /**
  * @author lifei
@@ -23,6 +26,8 @@ public class ForumDao {
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    private static final String ADD_FORUM_SQL = "insert into t_forum(forum_name, forum_desc) values(?,?)";
 
     /**
      * 添加数据
@@ -49,6 +54,54 @@ public class ForumDao {
                 ps.setString(2, forum.getForumDesc());
             }
         });*/
+
+    }
+
+    /**
+     * 添加一条记录，并返回绑定一个主键值
+     * @param forum
+     */
+    public void addForumAndFetchId(Forum forum){
+        // 创建一个主键持有者
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                /**
+                 * Statement.RETURN_GENERATED_KEYS 绑定主键值
+                 * Statement.NO_GENERATED_KEYS  不绑定主键值
+                 */
+                PreparedStatement ps = connection.prepareStatement(ADD_FORUM_SQL, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, forum.getForumName());
+                ps.setString(2, forum.getForumDesc());
+                return ps;
+            }
+        }, keyHolder);
+        forum.setForumId(keyHolder.getKey().intValue());
+    }
+
+    /**
+     * 批量更新数据
+     * @param forumList
+     */
+    public void addForums(List<Forum> forumList){
+        jdbcTemplate.batchUpdate(ADD_FORUM_SQL, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                Forum forum = forumList.get(i);
+                preparedStatement.setString(1, forum.getForumName());
+                preparedStatement.setString(2, forum.getForumDesc());
+            }
+
+            /**
+             * 指定该批次的记录数
+             * @return
+             */
+            @Override
+            public int getBatchSize() {
+                return forumList.size();
+            }
+        });
     }
 
 
