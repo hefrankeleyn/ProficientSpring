@@ -317,5 +317,23 @@ insert into t_post_id(sequence_id) values(0);
 
 在定义表结构时将主键列设置为auto increment， 或者通过表的触发器分配主键
 
+## 六、行集`SQLRowSet`
 
+- 连接行集：绑定一个数据连接并在其整个生命周期中维护该连接；
+- 非连接行集：先绑定一个数据连接，获取数据后就关闭它。非连接行集可以在断开连接时更改数据，然后重新绑定数据连接，并将对数据的更改同步到数据库中。
+
+**对于大结果集的数据，使用SqlRowSet会造成很大的内存消耗，这点要铭记。**
+
+```java
+    /**
+     * 返回行集数据
+     * 对于大结果集的数据，使用SqlRowSet会造成很大的内存消耗，这点要铭记
+     * @param userId
+     * @return
+     */
+    public SqlRowSet getTopicRowSet(int userId){
+        String sql = "select topic_id, topic_title from t_topic where user_id=?";
+        return jdbcTemplate.queryForRowSet(sql, userId);
+    }
+```
 
