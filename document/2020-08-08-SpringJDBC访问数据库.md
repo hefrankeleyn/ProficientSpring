@@ -148,3 +148,15 @@ LOB代表大对象数据，包括BLOB和CLOB两种类型，前者用于存储大
 >   max_allowed_packet = 10M 
 
 > alter  table t_post modify post_attach  MediumBlob COMMENT '二进制流，图片，视频'; 
+
+### 4.1 插入LOB类型的数据
+
+以mysql为例：
+
+如果不是Oracle 9i 的数据库，只需要简单地配置一个`DefaultLobHandler`就可以了：[《完整的配置》]()
+
+```xml
+<!--  只要不是Oracle 9i 的数据库，即Oracle 10g 或其他数据库，则只要简单地配置一个DefaultLobHandler就可以了 -->
+    <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
+```
+
