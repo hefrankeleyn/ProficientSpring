@@ -7,9 +7,14 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.springframework.util.FileCopyUtils;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.List;
 
 
 /**
@@ -45,5 +50,24 @@ public class PostDaoTest extends AbstractTransactionalTestNGSpringContextTests {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 以块数据方式读取LOB数据
+     */
+    @Test
+    public void getAttachsTest(){
+        List<Post> postList = postDao.getAttachs(2);
+        Assert.assertNotNull(postList);
+    }
+
+    /**
+     * 以流数据方式读取LOB数据
+     * @throws FileNotFoundException
+     */
+    @Test
+    public void getAttachsByStreamTest() throws FileNotFoundException {
+        OutputStream outputStream = new FileOutputStream("out/temp.png");
+        postDao.getAttachsByStream(2, outputStream);
     }
 }

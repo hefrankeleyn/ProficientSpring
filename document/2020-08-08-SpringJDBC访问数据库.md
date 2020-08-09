@@ -153,10 +153,83 @@ LOB代表大对象数据，包括BLOB和CLOB两种类型，前者用于存储大
 
 以mysql为例：
 
-如果不是Oracle 9i 的数据库，只需要简单地配置一个`DefaultLobHandler`就可以了：[《完整的配置》]()
+如果不是Oracle 9i 的数据库，只需要简单地配置一个`DefaultLobHandler`就可以了：[《完整的配置》](https://github.com/hefrankeleyn/ProficientSpring/blob/master/chapter13/src/main/resources/spring-db.xml)
+
+Oracle 9i还需要配置 `NativeJdbcExtractor`。
 
 ```xml
 <!--  只要不是Oracle 9i 的数据库，即Oracle 10g 或其他数据库，则只要简单地配置一个DefaultLobHandler就可以了 -->
     <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
+```
+
+## 4.2 读取LOB类型的数据
+
+#### （1） 以块数据方式读取LOB数据
+
+由于Lob数据的体积可能很大（如100MB），如果直接以块的方式操作LOB数据，则需要消耗大量的内存，直接影响程序的整体运行。对于体积很大的LOB数据，可以使用流的方式进行访问。
+
+```java
+    /**
+     * 以块数据方式读取LOB数据
+     * 由于Lob数据的体积可能很大（如100MB），如果直接以块的方式操作LOB数据，则需要消耗大量的内存，直接影响程序的整体运行。对于体积很大的LOB数据，可以使用流的方式进行访问。
+     * @param userId
+     * @return
+     */
+    public List<Post> getAttachs(final int userId){
+        String sql = "select post_id, post_attach from t_post where user_id=? and post_attach is not null";
+        return jdbcTemplate.query(sql, new Object[]{userId}, new RowMapper<Post>() {
+            @Override
+            public Post mapRow(ResultSet resultSet, int i) throws SQLException {
+                int postId = resultSet.getInt(1);
+                byte[] attach = lobHandler.getBlobAsBytes(resultSet, 2);
+
+                Post post = new Post();
+                post.setPostId(postId);
+                post.setPostAttach(attach);
+                return post;
+            }
+        });
+    }
+```
+
+#### （2）以流数据方式读取LOB数据
+
+由于Lob数据的体积可能很大（如100MB），如果直接以块的方式操作LOB数据，则需要消耗大量的内存，直接影响程序的整体运行。对于体积很大的LOB数据，可以使用流的方式进行访问。
+
+```java
+    /**
+     * 以流的形式读取LOB数据
+     * @param postId
+     * @param outputStream
+     */
+    public void getAttachsByStream(int postId, OutputStream outputStream){
+        String sql = "select post_attach from t_post where post_id=? and post_attach is not null";
+        jdbcTemplate.query(sql, new Object[]{postId}, new AbstractLobStreamingResultSetExtractor<Object>() {
+
+            @Override
+            protected void handleNoRowFound() throws DataAccessException {
+                System.out.println("Not Found result!");
+            }
+            @Override
+            protected void streamData(ResultSet resultSet) throws SQLException, IOException, DataAccessException {
+                InputStream is = lobHandler.getBlobAsBinaryStream(resultSet, 1);
+                if (is !=null){
+                    FileCopyUtils.copy(is, outputStream);
+                }
+            }
+        });
+    }
+```
+
+```java
+    /**
+     * 以流数据方式读取LOB数据
+     * @throws FileNotFoundException
+     */
+    @Test
+    public void getAttachsByStreamTest() throws FileNotFoundException {
+        OutputStream outputStream = new FileOutputStream("out/temp.png");
+        postDao.getAttachsByStream(2, outputStream);
+    }
 ```
 
