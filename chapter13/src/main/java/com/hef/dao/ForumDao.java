@@ -2,15 +2,13 @@ package com.hef.dao;
 
 import com.hef.beans.Forum;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.*;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -92,7 +90,6 @@ public class ForumDao {
                 preparedStatement.setString(1, forum.getForumName());
                 preparedStatement.setString(2, forum.getForumDesc());
             }
-
             /**
              * 指定该批次的记录数
              * @return
@@ -103,6 +100,73 @@ public class ForumDao {
             }
         });
     }
+
+    /**
+     * 查询数据
+     * @param forumId
+     * @return
+     */
+    public Forum getForum(int forumId){
+        String sql = "select forum_name, forum_desc from t_forum where forum_id=?";
+        Forum forum = new Forum();
+        jdbcTemplate.query(sql, new Object[]{forumId}, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet resultSet) throws SQLException {
+                forum.setForumId(forumId);
+                forum.setForumName(resultSet.getString("forum_name"));
+                forum.setForumDesc(resultSet.getString("forum_desc"));
+            }
+        });
+        return forum;
+    }
+
+    /**
+     * 使用 RowCallbackHandler 查询多个
+     * @param forumId
+     * @param forumId02
+     * @return
+     */
+    public List<Forum> getForumByForumIds(int forumId, int forumId02){
+        String sql = "select forum_id, forum_name, forum_desc from t_forum where forum_id in (?,?) ";
+        List<Forum> forumList = new ArrayList<>();
+        jdbcTemplate.query(sql, new Object[]{forumId, forumId02}, new RowCallbackHandler() {
+            @Override
+            public void processRow(ResultSet resultSet) throws SQLException {
+                Forum forum = new Forum();
+                forum.setForumId(resultSet.getInt("forum_id"));
+                forum.setForumName(resultSet.getString("forum_name"));
+                forum.setForumDesc(resultSet.getString("forum_desc"));
+                forumList.add(forum);
+            }
+        });
+        return forumList;
+    }
+
+    /**
+     * 通过 RollMapper 查询多个
+     * @param forumId
+     * @param forumId02
+     * @return
+     */
+    public List<Forum> getForumByForumIdsAndRollMapper(int forumId, int forumId02){
+        String sql = "select forum_id, forum_name, forum_desc from t_forum where forum_id in (?,?) ";
+        return jdbcTemplate.query(sql, new Object[]{forumId, forumId02}, new RowMapper<Forum>() {
+            @Override
+            public Forum mapRow(ResultSet resultSet, int i) throws SQLException {
+                Forum forum = new Forum();
+                forum.setForumId(resultSet.getInt("forum_id"));
+                forum.setForumName(resultSet.getString("forum_name"));
+                forum.setForumDesc(resultSet.getString("forum_desc"));
+                return forum;
+            }
+        });
+    }
+
+    public int getForumNum(){
+        String sql = "select count(*) from t_forum";
+        return jdbcTemplate.queryForObject(sql, Integer.class);
+    }
+
 
 
 }

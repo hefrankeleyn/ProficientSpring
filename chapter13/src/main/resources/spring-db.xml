@@ -32,6 +32,8 @@
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"
           p:dataSource-ref="dataSource" />
 
+    <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
+
     <!--    基于数据源的事务管理器 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
           p:dataSource-ref="dataSource"/>
