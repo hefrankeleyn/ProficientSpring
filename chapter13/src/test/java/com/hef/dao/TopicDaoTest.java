@@ -1,10 +1,14 @@
 package com.hef.dao;
 
+import com.hef.beans.Topic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTransactionalTestNGSpringContextTests;
 import org.testng.annotations.Test;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author lifei
@@ -29,5 +33,13 @@ public class TopicDaoTest extends AbstractTransactionalTestNGSpringContextTests 
         while (topicRowSet.next()){
             System.out.println(topicRowSet.getString("topic_title"));
         }
+    }
+
+    @Test
+    public void findTopicListTest(){
+        Topic topic = new Topic();
+        topic.setUserId(2);
+        List<Topic> topicList = topicDao.findTopicList(topic);
+        System.out.println(topicList);
     }
 }

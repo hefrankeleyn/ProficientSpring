@@ -43,6 +43,10 @@
     <!-- 配置Jdbc模板  -->
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"
           p:dataSource-ref="dataSource" />
+<!--    配置一个可以使用 命名参数的 JdbcTemplate -->
+    <bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 <!--  只要不是Oracle 9i 的数据库，即Oracle 10g 或其他数据库，则只要简单地配置一个DefaultLobHandler就可以了 -->
     <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
 

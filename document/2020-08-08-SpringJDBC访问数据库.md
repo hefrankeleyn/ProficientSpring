@@ -337,3 +337,39 @@ insert into t_post_id(sequence_id) values(0);
     }
 ```
 
+## 七、`NamedParameterJdbcTemplate`模版类
+
+`NamedParameterJdbcTemplate`支持命名参数变量的SQL。在SQL语句中声明命名参数的格式是：“:paramName”。
+
+第一步： 配置`NamedParameterJdbcTemplate`
+
+```xml
+<!--    配置一个可以使用 命名参数的 JdbcTemplate -->
+    <bean id="namedParameterJdbcTemplate" class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+```
+
+第二步：使用
+
+```java
+    /**
+     * 使用 NamedParameterJdbcTemplate
+     * @param topic
+     * @return
+     */
+    public List<Topic> findTopicList(Topic topic){
+        String sql = "select topic_title from t_topic where user_id=:userId";
+        Map<String, Integer> paramMap = new HashMap<>();
+        paramMap.put("userId", topic.getUserId());
+        return namedParameterJdbcTemplate.query(sql, paramMap, new RowMapper<Topic>() {
+            @Override
+            public Topic mapRow(ResultSet resultSet, int i) throws SQLException {
+                Topic oneTopic = new Topic();
+                oneTopic.setTopicTitle(resultSet.getString("topic_title"));
+                return oneTopic;
+            }
+        });
+    }
+```
+
