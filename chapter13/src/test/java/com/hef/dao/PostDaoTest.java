@@ -52,6 +52,20 @@ public class PostDaoTest extends AbstractTransactionalTestNGSpringContextTests {
         }
     }
 
+    @Test
+    @Rollback(value = false)
+    public void addPostWithIncrementerTest(){
+        Post post = new Post();
+        post.setForumId(2);
+        post.setUserId(3);
+        post.setTopicId(4);
+        post.setPostText("使用递增迭代器");
+        String attachStr = "MySQL incrementer";
+        byte[] bytes = attachStr.getBytes();
+        post.setPostAttach(bytes);
+        postDao.addPostWithIncrementer(post);
+    }
+
     /**
      * 以块数据方式读取LOB数据
      */

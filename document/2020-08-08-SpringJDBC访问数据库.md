@@ -162,7 +162,7 @@ Oracle 9i还需要配置 `NativeJdbcExtractor`。
     <bean id="lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
 ```
 
-## 4.2 读取LOB类型的数据
+###  4.2 读取LOB类型的数据
 
 #### （1） 以块数据方式读取LOB数据
 
@@ -232,4 +232,90 @@ Oracle 9i还需要配置 `NativeJdbcExtractor`。
         postDao.getAttachsByStream(2, outputStream);
     }
 ```
+
+## 五、自增键和行集
+
+Spring JDBC 提供了对自增键及行集的支持
+
+### 5.1 自增键的使用
+
+**Spring允许用户在应用层产生主键值。**为此，定义了：
+
+`org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer`， 提供了两种产生主键的方案：**第一，通过序列产生主键**；**第二，通过表产生主键**。根据主键产生方式及数据库类型的不同，Spring提供了若干实现类。
+
+#### （1）以表方式产生主键值
+
+第一步： 在MySQL数据库中创建一张用于维护t_post主键的t_post_id表。需要为该表提供初始值，以便后续主键值可以在此基础之上进行递增。
+
+```sql
+create table t_post_id(sequence_id int(11)) ENGINE=MyISAM;
+insert into t_post_id(sequence_id) values(0);
+```
+
+第二步：配置`MySQLMaxValueIncrementer`
+
+```xml
+<!--    配置一个用于产生主键的递增器 
+      incrementerName: 设置维护主键的表名
+      columnName： 用于生成主键值的别名
+      cacheSize： 缓存大小，（一次返回主键的个数。先从缓存中取值，取完了，才会再递增查询）
+-->
+    <bean id="incrementer"
+          class="org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer"
+          p:incrementerName="t_post_id"  
+          p:columnName="sequence_id"
+          p:cacheSize="10"
+          p:dataSource-ref="dataSource"/>
+```
+
+第三步：使用
+
+```java
+    /**
+     * 使用递增迭代器 进行自增主键
+     * @param post
+     */
+    public void addPostWithIncrementer(Post post){
+        String sql = "insert into t_post(post_id, topic_id,forum_id, user_id, post_text, post_attach) " +
+                " values(?,?,?,?,?,?)";
+        jdbcTemplate.execute(sql, new AbstractLobCreatingPreparedStatementCallback(this.lobHandler) {
+            @Override
+            protected void setValues(PreparedStatement preparedStatement, LobCreator lobCreator) throws SQLException, DataAccessException {
+                // 使用递增迭代器
+                preparedStatement.setInt(1, incrementer.nextIntValue());
+                preparedStatement.setInt(2, post.getTopicId());
+                preparedStatement.setInt(3, post.getForumId());
+                preparedStatement.setInt( 4, post.getUserId());
+                lobCreator.setClobAsString(preparedStatement, 5, post.getPostText());
+                lobCreator.setBlobAsBytes(preparedStatement, 6, post.getPostAttach());
+            }
+        });
+    }
+```
+
+#### （2）`DataFieldMaxValueIncrementer`存在的问题
+
+基于序列表的方式创建主键值，应该考虑两个层面的并发问题：
+
+- 其一，应用层获取主键的并发问题，
+
+  Spring的DataFieldMaxValueIncrementer实现类已经对获取主键值的代码进行了同步，因此保证了同一JVM内应用不会产生并发问题；
+
+- 其二，全局的并发问题
+
+  如果应用是集群部署的，所有集群节点都通过同一张序列表获取主键值，那么就必须对这张序列表进行乐观锁定（序列表必须添加一个版本或时间戳字段），以防止集群节点的并发问题。
+
+  **Spring的DataFieldMaxValueIncrementer实现类并没有对序列表进行乐观锁定，因此，如果应用需要集群部署，那么Spring对DataFieldMaxValueIncrementer实现类是有全局并发问题的，必须自己实现DataFieldMaxValueIncrementer接口，以解决全局并发的问题。**
+
+### 5.2 规划主键的方案
+
+#### （1）“应用层主键“方案，新数据的主键分配由应用层负责
+
+采用UUID或者使用DataFieldMaxValueIncrementer生成主键都属于这一类型。
+
+#### （2）”数据库主键方案“，新数据的主键分配由数据库负责
+
+在定义表结构时将主键列设置为auto increment， 或者通过表的触发器分配主键
+
+
 

@@ -28,6 +28,18 @@
           p:username="${jdbc.username}"
           p:password="${jdbc.password}"/>
 
+<!--    配置一个用于产生主键的递增器
+      incrementerName: 设置维护主键的表名
+      columnName： 用于生成主键值的别名
+      cacheSize： 缓存大小，（一次返回主键的个数。先从缓存中取值，取完了，才会再递增查询）
+-->
+    <bean id="incrementer"
+          class="org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer"
+          p:incrementerName="t_post_id"
+          p:columnName="sequence_id"
+          p:cacheSize="10"
+          p:dataSource-ref="dataSource"/>
+
     <!-- 配置Jdbc模板  -->
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate"
           p:dataSource-ref="dataSource" />

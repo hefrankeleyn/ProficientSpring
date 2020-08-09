@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
 import org.springframework.jdbc.core.support.AbstractLobStreamingResultSetExtractor;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.stereotype.Repository;
@@ -29,6 +30,12 @@ public class PostDao {
 
     private JdbcTemplate jdbcTemplate;
     private LobHandler lobHandler;
+    private DataFieldMaxValueIncrementer incrementer;
+
+    @Autowired
+    public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {
+        this.incrementer = incrementer;
+    }
 
     @Autowired
     public void setLobHandler(LobHandler lobHandler) {
@@ -50,6 +57,27 @@ public class PostDao {
                 preparedStatement.setInt( 3, post.getUserId());
                 lobCreator.setClobAsString(preparedStatement, 4, post.getPostText());
                 lobCreator.setBlobAsBytes(preparedStatement, 5, post.getPostAttach());
+            }
+        });
+    }
+
+    /**
+     * 使用递增迭代器 进行自增主键
+     * @param post
+     */
+    public void addPostWithIncrementer(Post post){
+        String sql = "insert into t_post(post_id, topic_id,forum_id, user_id, post_text, post_attach) " +
+                " values(?,?,?,?,?,?)";
+        jdbcTemplate.execute(sql, new AbstractLobCreatingPreparedStatementCallback(this.lobHandler) {
+            @Override
+            protected void setValues(PreparedStatement preparedStatement, LobCreator lobCreator) throws SQLException, DataAccessException {
+                // 使用递增迭代器
+                preparedStatement.setInt(1, incrementer.nextIntValue());
+                preparedStatement.setInt(2, post.getTopicId());
+                preparedStatement.setInt(3, post.getForumId());
+                preparedStatement.setInt( 4, post.getUserId());
+                lobCreator.setClobAsString(preparedStatement, 5, post.getPostText());
+                lobCreator.setBlobAsBytes(preparedStatement, 6, post.getPostAttach());
             }
         });
     }
