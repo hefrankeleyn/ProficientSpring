@@ -1,5 +1,8 @@
 package com.hef.domain;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
+
+import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -14,6 +17,7 @@ public class Post {
     private String postText;
     private byte[] postAttach;
     private Date postTime;
+    private Topic topic;
     public int getForumId() {
         return forumId;
     }
@@ -55,5 +59,18 @@ public class Post {
     }
     public void setPostAttach(byte[] postAttach) {
         this.postAttach = postAttach;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }
