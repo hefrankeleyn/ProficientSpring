@@ -17,7 +17,7 @@
         <cglib.version>3.3.0</cglib.version>
         <mysql.version>8.0.19</mysql.version>
         <jasypt.version>1.5</jasypt.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <spring-asm.version>3.1.4.RELEASE</spring-asm.version>
         <aspectjweaver.version>1.9.4</aspectjweaver.version>
         <aspectjtools.version>1.9.4</aspectjtools.version>
